@@ -416,6 +416,11 @@ PipelineCache::PipelineCache(const Instance& instance_, Scheduler& scheduler_,
         });
         LOG_INFO(Render_Vulkan, "spartanport: async graphics compilation ready ({} capture, {} compile workers)",
                  capture_count, count);
+        // spartanport: say whether shaders compile in the background and where that came from.
+        const bool async_on = SpartanSettings::Get().async_shaders.load(std::memory_order_relaxed);
+        const char* async_env = std::getenv("SPARTAN_ASYNC_SHADERS");
+        LOG_INFO(Render_Vulkan, "GPU: background shader compilation {}{}", async_on ? "on" : "off",
+                 async_env && *async_env ? " (SPARTAN_ASYNC_SHADERS)" : (async_on ? " (default)" : " (settings)"));
     }
 }
 
