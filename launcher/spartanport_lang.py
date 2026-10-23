@@ -2426,6 +2426,65 @@ EXTRA['id'].update({
     'Version {} is out, but it has no Linux build yet.': 'Versi {} telah tersedia, tetapi belum memiliki build Linux.',
 })
 
+# Dynamic vertex input (SPARTAN_VERTEX_INPUT_DYNAMIC): the setting that fixes black or blue 3D on Intel.
+for _language, _texts in {
+    'ar': (
+        'الإدخال الديناميكي للرؤوس',
+        'إيقاف (يصلح الرسوم ثلاثية الأبعاد السوداء أو الزرقاء على Intel)',
+        'الطريقة التي تمرّر بها اللعبة بيانات الرؤوس إلى وحدة المعالجة الرسومية (VK_EXT_vertex_input_dynamic_state). يرسم تعريف Intel على ويندوز (HD وUHD وIris وArc) المشهد ثلاثي الأبعاد باللون الأسود أو الأزرق عند تفعيلها، لذلك يعطّلها الخيار «تلقائي» هناك ويُبقيها مفعّلة في غيرها. تُعاد بناء ذاكرة الشيدر المؤقتة مرة واحدة عند تغيير هذا الخيار.'),
+    'es': (
+        'Entrada dinámica de vértices',
+        'Desactivado (corrige el 3D negro o azul en Intel)',
+        'Cómo entrega el juego los datos de vértices a la GPU (VK_EXT_vertex_input_dynamic_state). El driver de Intel en Windows (HD, UHD, Iris, Arc) dibuja la escena 3D en negro o azul con esta opción, así que Automático la desactiva ahí y la mantiene activada en el resto. La caché de shaders se reconstruye una vez cuando esto cambia.'),
+    'pt': (
+        'Entrada dinâmica de vértices',
+        'Desligado (corrige o 3D preto ou azul na Intel)',
+        'Como o jogo entrega os dados de vértices à GPU (VK_EXT_vertex_input_dynamic_state). O driver da Intel no Windows (HD, UHD, Iris, Arc) desenha a cena 3D em preto ou azul com ela, então Automático a desliga ali e a mantém ligada nas demais. O cache de shaders é refeito uma vez quando isso muda.'),
+    'fr': (
+        'Entrée dynamique des sommets',
+        'Désactivé (corrige la 3D noire ou bleue sur Intel)',
+        'Comment le jeu transmet les données de sommets au GPU (VK_EXT_vertex_input_dynamic_state). Le pilote Intel sous Windows (HD, UHD, Iris, Arc) affiche la scène 3D en noir ou en bleu avec cette option ; Automatique la désactive donc sur ces cartes et la laisse activée ailleurs. Le cache de shaders est reconstruit une fois quand ce réglage change.'),
+    'de': (
+        'Dynamische Vertex-Eingabe',
+        'Aus (behebt schwarze oder blaue 3D-Grafik bei Intel)',
+        'Wie das Spiel Vertex-Daten an die GPU übergibt (VK_EXT_vertex_input_dynamic_state). Der Intel-Treiber unter Windows (HD, UHD, Iris, Arc) zeichnet die 3D-Szene damit schwarz oder blau; Automatisch schaltet sie dort daher aus und lässt sie sonst an. Der Shader-Cache wird bei einer Änderung einmal neu aufgebaut.'),
+    'it': (
+        'Input dinamico dei vertici',
+        'Disattivato (corregge il 3D nero o blu su Intel)',
+        'Come il gioco passa i dati dei vertici alla GPU (VK_EXT_vertex_input_dynamic_state). Il driver Intel su Windows (HD, UHD, Iris, Arc) disegna la scena 3D in nero o blu con questa opzione, quindi Automatico la disattiva lì e la mantiene attiva altrove. La cache degli shader viene ricostruita una volta quando cambia.'),
+    'pl': (
+        'Dynamiczne wejście wierzchołków',
+        'Wyłączone (naprawia czarną lub niebieską grafikę 3D na Intelu)',
+        'Sposób, w jaki gra przekazuje dane wierzchołków do GPU (VK_EXT_vertex_input_dynamic_state). Sterownik Intela w Windows (HD, UHD, Iris, Arc) rysuje z nią scenę 3D na czarno lub niebiesko, dlatego Automatycznie wyłącza ją tam i zostawia włączoną na innych kartach. Pamięć podręczna shaderów jest odbudowywana raz po zmianie.'),
+    'tr': (
+        'Dinamik köşe girişi',
+        "Kapalı (Intel'de siyah veya mavi 3D görüntüyü düzeltir)",
+        "Oyunun köşe verilerini GPU'ya nasıl ilettiği (VK_EXT_vertex_input_dynamic_state). Windows'taki Intel sürücüsü (HD, UHD, Iris, Arc) bununla 3D sahneyi siyah veya mavi çizer; bu yüzden Otomatik burada kapatır, diğer kartlarda açık bırakır. Bu ayar değişince shader önbelleği bir kez yeniden oluşturulur."),
+    'zh': (
+        '动态顶点输入',
+        '关闭（修复 Intel 上 3D 画面发黑或发蓝）',
+        '游戏向 GPU 传递顶点数据的方式（VK_EXT_vertex_input_dynamic_state）。Windows 上的 Intel 驱动（HD、UHD、Iris、Arc）开启它会使 3D 场景发黑或发蓝，因此“自动”会在这些显卡上关闭它，其他显卡上保持开启。更改此项后，着色器缓存会重建一次。'),
+    'ja': (
+        '動的頂点入力',
+        'オフ（Intelで3Dが黒や青になる問題を修正）',
+        'ゲームが頂点データをGPUに渡す方法（VK_EXT_vertex_input_dynamic_state）です。WindowsのIntelドライバー（HD、UHD、Iris、Arc）では、これを有効にすると3Dシーンが黒や青になるため、「自動」ではそのカードでオフ、他ではオンにします。変更するとシェーダーキャッシュが一度再構築されます。'),
+    'ko': (
+        '동적 버텍스 입력',
+        '끔 (Intel에서 3D가 검거나 파랗게 나오는 문제 해결)',
+        "게임이 정점 데이터를 GPU에 전달하는 방식입니다(VK_EXT_vertex_input_dynamic_state). Windows의 Intel 드라이버(HD, UHD, Iris, Arc)는 이 옵션을 켜면 3D 장면을 검거나 파랗게 그리므로, '자동'은 해당 그래픽카드에서는 끄고 그 외에는 켭니다. 이 설정을 바꾸면 셰이더 캐시가 한 번 다시 만들어집니다."),
+    'id': (
+        'Input vertex dinamis',
+        'Mati (memperbaiki 3D hitam atau biru di Intel)',
+        'Cara game mengirim data vertex ke GPU (VK_EXT_vertex_input_dynamic_state). Driver Intel di Windows (HD, UHD, Iris, Arc) menggambar adegan 3D hitam atau biru dengan opsi ini, jadi Otomatis mematikannya di sana dan membiarkannya aktif di tempat lain. Cache shader dibangun ulang sekali saat ini diubah.'),
+}.items():
+    EXTRA.setdefault(_language, {}).update({
+        'Dynamic vertex input': _texts[0],
+        'Off (fixes black or blue 3D on Intel)': _texts[1],
+        ("How the game hands vertex data to the GPU (VK_EXT_vertex_input_dynamic_state). Intel's Windows "
+         'driver (HD, UHD, Iris, Arc) draws the 3D scene black or blue with it, so Automatic turns it off '
+         'there and keeps it on elsewhere. The shader cache is rebuilt once when this changes.'): _texts[2],
+    })
+
 _tables = {}
 
 

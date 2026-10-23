@@ -14,6 +14,8 @@
 #include "sdl_window.h"
 #include "video_core/amdgpu/spartanport_msaa.h"
 #include "video_core/amdgpu/spartanport_msaa_default.h"
+#include "video_core/amdgpu/spartanport_vertex_input_default.h"
+#include "video_core/renderer_vulkan/vk_vertex_input_cache.h"
 #include "video_core/renderer_vulkan/liverpool_to_vk.h"
 #include "video_core/renderer_vulkan/vk_amd_paths.h"
 #include "video_core/renderer_vulkan/vk_dlss.h"
@@ -355,7 +357,18 @@ bool Instance::CreateDevice() {
     custom_border_color = add_extension(VK_EXT_CUSTOM_BORDER_COLOR_EXTENSION_NAME);
     depth_clip_control = add_extension(VK_EXT_DEPTH_CLIP_CONTROL_EXTENSION_NAME);
     depth_clip_enable = add_extension(VK_EXT_DEPTH_CLIP_ENABLE_EXTENSION_NAME);
-    vertex_input_dynamic_state = add_extension(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
+    // spartanport: see video_core/amdgpu/spartanport_vertex_input_default.h. Intel's Windows driver
+    // draws 3D black or blue with it; SPARTAN_VERTEX_INPUT_DYNAMIC=1/0 forces it on/off.
+    const char* vertex_input_env = std::getenv("SPARTAN_VERTEX_INPUT_DYNAMIC");
+    const bool want_dynamic_vertex_input =
+        vertex_input_env && *vertex_input_env
+            ? *vertex_input_env == '1'
+            : spartanport_vertex_input_dynamic_default(static_cast<VkDriverId>(driver_id)) != 0;
+    std::printf("GPU: dynamic vertex input %s\n",
+                want_dynamic_vertex_input ? "on" : "off (SPARTAN_VERTEX_INPUT_DYNAMIC=1 forces it)");
+    vertex_input_dynamic_state =
+        want_dynamic_vertex_input && add_extension(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
+    VertexInputCache::SetDynamic(vertex_input_dynamic_state);
     list_restart = add_extension(VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME);
     if (list_restart) {
         list_restart_features =

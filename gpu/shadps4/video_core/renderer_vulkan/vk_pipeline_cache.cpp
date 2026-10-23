@@ -416,6 +416,11 @@ PipelineCache::PipelineCache(const Instance& instance_, Scheduler& scheduler_,
         });
         LOG_INFO(Render_Vulkan, "spartanport: async graphics compilation ready ({} capture, {} compile workers)",
                  capture_count, count);
+        // spartanport: say whether shaders compile in the background and where that came from.
+        const bool async_on = SpartanSettings::Get().async_shaders.load(std::memory_order_relaxed);
+        const char* async_env = std::getenv("SPARTAN_ASYNC_SHADERS");
+        LOG_INFO(Render_Vulkan, "GPU: background shader compilation {}{}", async_on ? "on" : "off",
+                 async_env && *async_env ? " (SPARTAN_ASYNC_SHADERS)" : (async_on ? " (default)" : " (settings)"));
     }
 }
 
@@ -1145,8 +1150,18 @@ bool PipelineCache::RefreshGraphicsStages(PipelineSelection& sel) {
             ASSERT_MSG(vertex_binding < MaxVertexBufferCount,
                        "Vertex attribute binding count exceeded limit: {} >= {}", vertex_binding,
                        MaxVertexBufferCount);
-            key.vertex_buffer_formats[vertex_binding++] =
-                Vulkan::LiverpoolToVK::SurfaceFormat(buffer.GetDataFmt(), buffer.GetNumberFmt());
+            // spartanport: the V# may be user data the guest is still writing; an unknown format
+            // skips this draw instead of stopping in SurfaceFormat's assertion.
+            const vk::Format format = Vulkan::LiverpoolToVK::TrySurfaceFormat(
+                buffer.GetDataFmt(), buffer.GetNumberFmt());
+            if (format == vk::Format::eUndefined &&
+                buffer.GetDataFmt() != AmdGpu::DataFormat::FormatInvalid) {
+                LOG_WARNING(Render_Vulkan, "Skipping draw with unknown vertex format {}/{}",
+                            static_cast<u32>(buffer.GetDataFmt()),
+                            static_cast<u32>(buffer.GetNumberFmt()));
+                return false;
+            }
+            key.vertex_buffer_formats[vertex_binding++] = format;
         }
     }
 

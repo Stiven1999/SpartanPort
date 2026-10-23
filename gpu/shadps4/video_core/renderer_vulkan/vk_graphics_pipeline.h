@@ -119,7 +119,8 @@ public:
     void GetVertexInputs(VertexInputs<Attribute>& attributes, VertexInputs<Binding>& bindings,
                          VertexInputs<vk::VertexInputBindingDivisorDescriptionEXT>& divisors,
                          VertexInputs<AmdGpu::Buffer>& guest_buffers, u32 step_rate_0,
-                         u32 step_rate_1) const;
+                         u32 step_rate_1,
+                         const vk::Format* key_formats = nullptr) const;
 
 private:
     void BuildDescSetLayout(bool preloading);

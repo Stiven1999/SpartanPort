@@ -492,7 +492,7 @@ UI_SCALES = [('auto', ('Auto',)), ('1', ('1x',)), ('2', ('2x',))]
 APP_DEFAULTS = {'ui_language': 'en', 'ui_scale': 'auto', 'game_dir': os.environ.get('SPARTAN_GAME_DIR', str(PORT_DIR.parent / 'CUSA01623') if WINDOWS else ''), 'update_dir': '', 'experimental_upscaler': False,
                 'video_backend': 'auto', 'gamemode': False, 'mangohud': False, 'desktop_integration': True, 'user_dir': '',
                 'mods_dir': '', 'mods_enabled': True, 'patches_dir': '', 'language': '1',
-                'hdr': False, 'draw_pipe': '', 'readbacks': '', 'no_msaa': '', 'stream_memory': 'cached',
+                'hdr': False, 'draw_pipe': '', 'readbacks': '', 'no_msaa': '', 'vertex_input': '', 'stream_memory': 'cached',
                 'gpu_id': '', 'monitor': '', 'partial_height_views': True, 'disk_shaders': True, 'shader_prefetch': True, 'shader_notes': False, 'background_warmup': True, 'parallel_warmup': True, 'pipeline_binary_cache': True,
                 'perf_diag': False, 'frame_capture_key': False, 'frame_stats': False, 'gpu_profile': False,
                 'vk_validation': False, 'close_on_play': False, 'discord_rpc': False,
@@ -773,6 +773,18 @@ NO_MSAA_HINT = ("The game's 2-sample depth buffer, read as a texture by its ligh
                 'drivers read it wrong and the lighting shows black lines, so Automatic turns multisampling off '
                 'on those cards (Radeon, Arc) and keeps it on elsewhere (NVIDIA). Off and On force the choice on '
                 'any card.')
+# SPARTAN_VERTEX_INPUT_DYNAMIC: '' leaves the game's own default, off on Intel's Windows driver
+# (video_core/amdgpu/spartanport_vertex_input_default.h).
+VERTEX_INPUT = [('', ('Automatic', 'Автоматически')), ('1', ('On', 'Включено')),
+                ('0', ('Off (fixes black or blue 3D on Intel)',
+                       'Выключено (исправляет чёрную или синюю 3D-графику на Intel)'))]
+VERTEX_INPUT_HINT = ("How the game hands vertex data to the GPU (VK_EXT_vertex_input_dynamic_state). Intel's Windows "
+                     'driver (HD, UHD, Iris, Arc) draws the 3D scene black or blue with it, so Automatic turns it off '
+                     'there and keeps it on elsewhere. The shader cache is rebuilt once when this changes.')
+VERTEX_INPUT_HINT_RU = ('Как игра передаёт данные вершин видеокарте (VK_EXT_vertex_input_dynamic_state). Драйвер Intel '
+                        'в Windows (HD, UHD, Iris, Arc) рисует 3D-сцену чёрной или синей с этой функцией, поэтому '
+                        '«Автоматически» отключает её там и оставляет включённой на остальных. Кэш шейдеров один раз '
+                        'пересобирается при изменении.')
 STREAM_MEMORY = [('cached', ('System RAM (cached, default)',)),
                  ('host', ('System RAM (uncached)',)),
                  ('device', ('GPU memory (previous behavior)',))]
@@ -1247,7 +1259,8 @@ def game_environment(s):
     env['SPARTAN_DISCORD'] = '1' if s.get('discord_rpc') else '0'
     if s['hdr']:
         env['SPARTAN_HDR'] = '1'
-    for key, name in (('draw_pipe', 'SPARTAN_DRAW_PIPE'), ('readbacks', 'SPARTAN_READBACKS'), ('no_msaa', 'SPARTAN_NO_MSAA')):
+    for key, name in (('draw_pipe', 'SPARTAN_DRAW_PIPE'), ('readbacks', 'SPARTAN_READBACKS'), ('no_msaa', 'SPARTAN_NO_MSAA'),
+                      ('vertex_input', 'SPARTAN_VERTEX_INPUT_DYNAMIC')):
         if s.get(key):
             env[name] = s[key]
     # The saved UI choice wins over inherited diagnostic overrides, including when reverting.
@@ -2086,6 +2099,10 @@ class Launcher:
         card = self.var('gpu_id', 'app')
         box = self.choice(f, 'no_msaa', 'app', no_msaa_options(gpus, card.get()), width=46)
         self.row(f, _('Game multisampling'), box, _(NO_MSAA_HINT), restart=True)
+
+        self.row(f, _('Dynamic vertex input', 'Динамический ввод вершин'),
+                 self.choice(f, 'vertex_input', 'app', VERTEX_INPUT, width=46),
+                 _(VERTEX_INPUT_HINT, VERTEX_INPUT_HINT_RU), restart=True)
 
         def relabel(*_args):  # Automatic names the card the game will run on
             index = max(box.current(), 0)
