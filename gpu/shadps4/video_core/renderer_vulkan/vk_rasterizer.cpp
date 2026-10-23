@@ -1809,7 +1809,10 @@ void Rasterizer::ResolveVertexBuffers(const GraphicsPipeline* pipeline,
         guest_buffers.assign(ready->buffers, ready->buffers + ready->count);
     } else {
         pipeline->GetVertexInputs(attributes, bindings, divisors, guest_buffers,
-                                  regs.vgt_instance_step_rate_0, regs.vgt_instance_step_rate_1);
+                                  regs.vgt_instance_step_rate_0, regs.vgt_instance_step_rate_1,
+                                  instance.IsVertexInputDynamicState()
+                                      ? nullptr
+                                      : pipeline->GetGraphicsKey().vertex_buffer_formats.data());
     }
 
     if (bindings.empty()) {

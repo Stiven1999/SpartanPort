@@ -15,6 +15,7 @@
 #include "video_core/amdgpu/spartanport_msaa.h"
 #include "video_core/amdgpu/spartanport_msaa_default.h"
 #include "video_core/amdgpu/spartanport_vertex_input_default.h"
+#include "video_core/renderer_vulkan/vk_vertex_input_cache.h"
 #include "video_core/renderer_vulkan/liverpool_to_vk.h"
 #include "video_core/renderer_vulkan/vk_amd_paths.h"
 #include "video_core/renderer_vulkan/vk_dlss.h"
@@ -367,6 +368,7 @@ bool Instance::CreateDevice() {
                 want_dynamic_vertex_input ? "on" : "off (SPARTAN_VERTEX_INPUT_DYNAMIC=1 forces it)");
     vertex_input_dynamic_state =
         want_dynamic_vertex_input && add_extension(VK_EXT_VERTEX_INPUT_DYNAMIC_STATE_EXTENSION_NAME);
+    VertexInputCache::SetDynamic(vertex_input_dynamic_state);
     list_restart = add_extension(VK_EXT_PRIMITIVE_TOPOLOGY_LIST_RESTART_EXTENSION_NAME);
     if (list_restart) {
         list_restart_features =

@@ -4,6 +4,7 @@
 #include <cassert>
 
 #include "video_core/amdgpu/spartanport_vertex_input_default.h"
+#include "video_core/renderer_vulkan/vk_vertex_input_cache.h"
 
 int main() {
     assert(!spartanport_vertex_input_dynamic_default(VK_DRIVER_ID_INTEL_PROPRIETARY_WINDOWS));
@@ -13,5 +14,10 @@ int main() {
     assert(spartanport_vertex_input_dynamic_default(VK_DRIVER_ID_MESA_RADV));
     assert(spartanport_vertex_input_dynamic_default(VK_DRIVER_ID_INTEL_OPEN_SOURCE_MESA));
     assert(spartanport_vertex_input_dynamic_default(VK_DRIVER_ID_MOLTENVK));
+    // The static path saves its pipeline keys under another version than the dynamic one.
+    assert(VertexInputCache::PipelineKeyVersion(5u, true) == 5u);
+    assert(VertexInputCache::PipelineKeyVersion(5u, false) != 5u);
+    VertexInputCache::SetDynamic(false);
+    assert(VertexInputCache::PipelineKeyVersion(5u) == VertexInputCache::PipelineKeyVersion(5u, false));
     return 0;
 }

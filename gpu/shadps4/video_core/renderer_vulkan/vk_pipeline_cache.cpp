@@ -1145,8 +1145,18 @@ bool PipelineCache::RefreshGraphicsStages(PipelineSelection& sel) {
             ASSERT_MSG(vertex_binding < MaxVertexBufferCount,
                        "Vertex attribute binding count exceeded limit: {} >= {}", vertex_binding,
                        MaxVertexBufferCount);
-            key.vertex_buffer_formats[vertex_binding++] =
-                Vulkan::LiverpoolToVK::SurfaceFormat(buffer.GetDataFmt(), buffer.GetNumberFmt());
+            // spartanport: the V# may be user data the guest is still writing; an unknown format
+            // skips this draw instead of stopping in SurfaceFormat's assertion.
+            const vk::Format format = Vulkan::LiverpoolToVK::TrySurfaceFormat(
+                buffer.GetDataFmt(), buffer.GetNumberFmt());
+            if (format == vk::Format::eUndefined &&
+                buffer.GetDataFmt() != AmdGpu::DataFormat::FormatInvalid) {
+                LOG_WARNING(Render_Vulkan, "Skipping draw with unknown vertex format {}/{}",
+                            static_cast<u32>(buffer.GetDataFmt()),
+                            static_cast<u32>(buffer.GetNumberFmt()));
+                return false;
+            }
+            key.vertex_buffer_formats[vertex_binding++] = format;
         }
     }
 

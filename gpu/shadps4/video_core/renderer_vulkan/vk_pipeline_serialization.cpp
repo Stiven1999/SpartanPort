@@ -34,6 +34,7 @@
 #include "video_core/cache_storage.h"
 #include "video_core/renderer_vulkan/vk_amd_paths.h"
 #include "video_core/renderer_vulkan/vk_instance.h"
+#include "video_core/renderer_vulkan/vk_vertex_input_cache.h"
 #include "video_core/renderer_vulkan/vk_lighting_test.h"
 #include "video_core/renderer_vulkan/vk_pipeline_cache.h"
 #include "video_core/renderer_vulkan/vk_shader_util.h"
@@ -706,7 +707,7 @@ void RegisterPipelineData(const ComputePipelineKey& key,
     Serialization::Archive ar{};
     Serialization::Writer pldata{ar};
 
-    pldata.Write(Serialization::PipelineKeyVersion);
+    pldata.Write(VertexInputCache::PipelineKeyVersion(Serialization::PipelineKeyVersion));
     pldata.Write(u32{1}); // compute
 
     key.Serialize(ar);
@@ -725,7 +726,7 @@ void RegisterPipelineData(const GraphicsPipelineKey& key, u64 hash,
     Serialization::Archive ar{};
     Serialization::Writer pldata{ar};
 
-    pldata.Write(Serialization::PipelineKeyVersion);
+    pldata.Write(VertexInputCache::PipelineKeyVersion(Serialization::PipelineKeyVersion));
     pldata.Write(u32{0}); // graphics
 
     key.Serialize(ar);
@@ -1088,7 +1089,7 @@ void PipelineCache::WarmUp(const std::function<void(u32, u32)>& progress) {
 
             u32 version{};
             pldata.Read(version);
-            if (version != Serialization::PipelineKeyVersion) {
+            if (version != VertexInputCache::PipelineKeyVersion(Serialization::PipelineKeyVersion)) {
                 return;
             }
 
@@ -1539,7 +1540,7 @@ void PipelineCache::ReadWarmEntry(BackgroundWarmup& warm, std::vector<u8>&& data
     Serialization::Reader pldata{ar};
     u32 version{};
     pldata.Read(version);
-    if (version != Serialization::PipelineKeyVersion) {
+    if (version != VertexInputCache::PipelineKeyVersion(Serialization::PipelineKeyVersion)) {
         return skip();
     }
     u32 is_compute{};
