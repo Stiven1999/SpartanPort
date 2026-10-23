@@ -36,5 +36,23 @@ class VertexInputEnvironmentTest(unittest.TestCase):
         self.assertNotIn('SPARTAN_VERTEX_INPUT_DYNAMIC', added(launcher.game_environment(legacy)))
 
 
+class VertexInputTranslationTest(unittest.TestCase):
+    def test_every_launcher_language_translates_the_texts(self):
+        import spartanport_lang
+        texts = ['Dynamic vertex input', launcher.VERTEX_INPUT[2][1][0], launcher.VERTEX_INPUT_HINT]
+        for language, _name in launcher.UI_LANGUAGES:
+            if language in ('', 'en', 'ru'):
+                continue
+            table = spartanport_lang.table(language)
+            for text in texts:
+                with self.subTest(language=language, text=text[:30]):
+                    self.assertNotEqual(table.get(text, text), text)
+
+    def test_russian_is_next_to_the_english_text(self):
+        for _value, text in launcher.VERTEX_INPUT:
+            self.assertEqual(len(text), 2)
+        self.assertTrue(launcher.VERTEX_INPUT_HINT_RU)
+
+
 if __name__ == '__main__':
     unittest.main()
