@@ -26,6 +26,7 @@
 #include "spartanport_write_log.h"
 #include "video_core/amdgpu/pm4_cmds.h"
 #include "video_core/renderdoc.h"
+#include "video_core/renderer_vulkan/vk_draw_profile.h"
 #include "video_core/renderer_vulkan/vk_rasterizer.h"
 
 namespace AmdGpu {
@@ -755,6 +756,13 @@ Liverpool::Task Liverpool::ProcessGraphics(std::span<const u32> dcb, std::span<c
         case 3:
             const u32 count = header->type3.NumWords();
             const PM4ItOpcode opcode = header->type3.opcode;
+            if (DrawProfile::Enabled()) {
+                thread_local DrawProfile::OpProfile op_profile;
+                op_profile.Packet(static_cast<unsigned>(opcode), [](unsigned op) {
+                    const auto name = magic_enum::enum_name(PM4ItOpcode(op));
+                    return name.empty() ? "unnamed" : name.data();
+                });
+            }
             ApplyGraphicsRegisterPacket(regs, header, gfx_reg_checksum, &pipe_dirty);
             // DmaData to 0x3022C does nothing here (skipped below): no need to wait.
             if (rasterizer && !PipelinedOpcode(opcode) &&
